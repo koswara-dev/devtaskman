@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getStatistics } from '../controllers/statisticsController';
+import { getStatistics, generateReportPdf } from '../controllers/statisticsController';
 import { verifyJWT, authorizeRoles } from '../middlewares/auth';
 
 const router = Router();
@@ -47,5 +47,30 @@ router.use(authorizeRoles(['Admin', 'PM', 'DevLeader', 'QALeader']));
  *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.get('/', getStatistics);
+
+/**
+ * @openapi
+ * /statistics/report.pdf:
+ *   get:
+ *     summary: Downloadable PDF rendering of the statistics report (Admin, PM, DevLeader, QALeader only)
+ *     tags: [Statistics]
+ *     parameters:
+ *       - in: query
+ *         name: dueSoonDays
+ *         schema: { type: integer, default: 3 }
+ *         description: Window in days for counting non-Done tasks due soon
+ *     responses:
+ *       200:
+ *         description: PDF report
+ *         content:
+ *           application/pdf:
+ *             schema: { type: string, format: binary }
+ *       403:
+ *         description: Role not in the reporting audience
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
+router.get('/report.pdf', generateReportPdf);
 
 export default router;

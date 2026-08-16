@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDevTask } from '../context/DevTaskContext';
 import type { TaskStatus } from '../types';
-import { BarChart3, PieChart, Activity, CheckCircle2, ListTodo, AlertTriangle, Users } from 'lucide-react';
+import { BarChart3, PieChart, Activity, CheckCircle2, ListTodo, AlertTriangle, Users, FileDown, AlertOctagon } from 'lucide-react';
+import { downloadFile } from '../api/client';
+
+const REPORTING_ROLES = ['Admin', 'PM', 'DevLeader', 'QALeader'];
 
 export const Dashboard: React.FC = () => {
-  const { tasks, users } = useDevTask();
+  const { tasks, users, currentUser } = useDevTask();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  const canDownloadReport = !!currentUser && REPORTING_ROLES.includes(currentUser.role);
+
+  const handleDownloadReport = async () => {
+    setDownloadError(null);
+    setIsDownloading(true);
+    try {
+      await downloadFile('/statistics/report.pdf', 'devtaskman-report.pdf');
+    } catch (err) {
+      setDownloadError(err instanceof Error ? err.message : 'Gagal mengunduh laporan PDF.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const total = tasks.length;
   const doneCount = tasks.filter(t => t.status === 'Done').length;
@@ -78,10 +97,30 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6 select-none text-slate-700">
       {/* Page Header */}
-      <div>
-        <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 m-0">Ringkasan Dasbor</h2>
-        <p className="text-xs text-slate-500 mt-1">Status real-time proyek DevTaskMan, rasio prioritas, dan beban kerja tim.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 m-0">Ringkasan Dasbor</h2>
+          <p className="text-xs text-slate-500 mt-1">Status real-time proyek DevTaskMan, rasio prioritas, dan beban kerja tim.</p>
+        </div>
+
+        {canDownloadReport && (
+          <button
+            onClick={handleDownloadReport}
+            disabled={isDownloading}
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-bold text-white rounded-xl shadow-lg shadow-brand-500/10 transition cursor-pointer flex-shrink-0"
+          >
+            <FileDown className="w-4 h-4" />
+            {isDownloading ? 'Membuat PDF...' : 'Unduh Laporan PDF'}
+          </button>
+        )}
       </div>
+
+      {downloadError && (
+        <div className="p-3 bg-red-50 border border-red-200 text-red-650 text-xs rounded-xl flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 flex-shrink-0" />
+          <span>{downloadError}</span>
+        </div>
+      )}
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

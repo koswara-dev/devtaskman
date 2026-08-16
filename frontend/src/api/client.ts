@@ -50,3 +50,37 @@ export const api = {
     request<T>(path, { method: 'PUT', body: body !== undefined ? JSON.stringify(body) : undefined }),
   del: <T = unknown>(path: string) => request<T>(path, { method: 'DELETE' })
 };
+
+// For binary responses (e.g. PDF export) — a plain <a href> can't carry the Authorization
+// header this API requires, so the file has to be fetched as a Blob and downloaded manually.
+export const downloadFile = async (path: string, fallbackFilename: string): Promise<void> => {
+  const token = getStoredToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}/api/v1${path}`, { headers });
+  if (!res.ok) {
+    let message = res.statusText || 'Gagal mengunduh berkas.';
+    try {
+      const data = await res.json();
+      message = data.error || message;
+    } catch {
+      // response wasn't JSON; keep the fallback message
+    }
+    throw new ApiError(res.status, message);
+  }
+
+  const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition');
+  const match = disposition?.match(/filename="?([^"]+)"?/);
+  const filename = match?.[1] || fallbackFilename;
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
