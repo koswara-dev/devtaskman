@@ -67,3 +67,7 @@ Suite ini otomatis menyalakan backend & frontend dev server serta mereset data s
 ## Alur Pengembangan (OpenSpec)
 
 Proyek ini mengikuti alur spec-driven: setiap perubahan fitur diajukan sebagai proposal di `openspec/changes/`, diterapkan, lalu diarsipkan ke `openspec/changes/archive/` dan digabung ke `openspec/specs/`. Jalankan `openspec list` atau `openspec view` untuk menjelajahi riwayat dan spesifikasi kapabilitas yang ada.
+
+## Dokumentasi QA & Testing
+
+[`docs/SIT_DevTaskMan.md`](docs/SIT_DevTaskMan.md) adalah acuan System Integration Testing (SIT) untuk tim QA — setiap skenario di dalamnya melacak balik ke satu `#### Scenario:` di `openspec/specs/`, dan menandai mana yang sudah teotomasi di `e2e/tests/`. Dokumen ini dijaga tetap sinkron dengan openspec via skill `sit-doc` (`.claude/skills/sit-doc/`).
