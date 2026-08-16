@@ -2,6 +2,16 @@
 
 Sistem Pelacakan Tugas Internal untuk kolaborasi tim Developer & QA — Kanban board, RBAC, notifikasi real-time, dan dasbor pelaporan. Lihat [`BRD_DevTaskMan.md`](BRD_DevTaskMan.md) untuk requirement bisnis lengkap.
 
+## Screenshots
+
+| Dashboard | Papan Kanban |
+| :---: | :---: |
+| ![Dashboard](screenshots/devtaskman1.jpg) | ![Papan Kanban](screenshots/devtaskman2.jpg) |
+
+| Timeline | Admin Panel |
+| :---: | :---: |
+| ![Timeline](screenshots/devtaskman3.jpg) | ![Admin Panel](screenshots/devtaskman4.jpg) |
+
 ## Struktur Proyek
 
 ```
