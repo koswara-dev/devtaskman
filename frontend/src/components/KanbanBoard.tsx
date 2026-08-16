@@ -206,9 +206,9 @@ export const KanbanBoard: React.FC = () => {
               {/* Column Header */}
               <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-200/60 flex-shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <h3 className="text-xs font-extrabold text-slate-700 tracking-wider uppercase m-0 flex items-center gap-1.5 truncate">
-                    {col.label}
-                    <span className="text-[10px] bg-slate-200/60 text-slate-655 font-bold px-2 py-0.5 rounded-full border border-slate-200">
+                  <h3 className="text-xs font-extrabold text-slate-700 tracking-wider uppercase m-0 flex items-center gap-1.5 min-w-0">
+                    <span className="truncate">{col.label}</span>
+                    <span className="flex-shrink-0 text-[10px] bg-slate-200/60 text-slate-655 font-bold px-2 py-0.5 rounded-full border border-slate-200">
                       {colTasks.length}
                     </span>
                   </h3>
