@@ -52,6 +52,8 @@ npm run dev              # http://localhost:5173
 
 Login menggunakan salah satu akun demo bawaan (lihat layar login) — semua akun seed berbagi password `password123`.
 
+Sebelum menambah/mengubah kode frontend, baca `context:` di [`openspec/config.yaml`](openspec/config.yaml) — aturan konsistensi (pola API client, state via context, role-gating, styling, dsb), otomatis ditampilkan ke AI setiap membuat artifact openspec.
+
 ### 3. E2E Tests (opsional)
 
 ```bash

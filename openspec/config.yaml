@@ -2,12 +2,97 @@ schema: spec-driven
 
 # Project context (optional)
 # This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  # Frontend Project Rules — DevTaskMan
+
+  Aturan umum untuk menjaga konsistensi kode di frontend/. Ikuti pola yang sudah
+  ada di codebase, jangan perkenalkan pola baru tanpa alasan kuat.
+
+  ## Stack
+
+  React 19 + TypeScript + Vite, React Router (HashRouter), Tailwind CSS v4
+  (via @theme di src/index.css, bukan lagi tailwind.config.js sebagai sumber
+  utama token), lucide-react untuk semua ikon.
+
+  ## Struktur
+
+  frontend/src/
+    api/client.ts     Satu-satunya tempat panggilan fetch ke backend
+    context/          DevTaskContext.tsx — satu context global untuk seluruh app state
+    hooks/            Custom hooks (mis. useNotificationStream)
+    components/       Satu file per komponen, PascalCase sesuai nama komponen
+    types.ts          Semua type domain (Task, User, Notification, Role, dst)
+
+  ## Aturan Wajib
+
+  1. Semua panggilan API lewat src/api/client.ts. Jangan panggil fetch()
+     langsung di komponen atau di context. Gunakan api.get/post/put/del (JSON)
+     atau downloadFile() (binary/PDF). Semua request otomatis membawa
+     Authorization: Bearer <token> dari localStorage['dtm_token'] via helper
+     ini — jangan attach header manual di tempat lain.
+
+  2. Semua state & mutasi data lewat DevTaskContext. Komponen tidak boleh
+     menyimpan state domain (tasks/users/notifications) sendiri atau memanggil
+     api.* langsung. Tambahkan fungsi baru ke DevTaskContextType +
+     implementasinya di DevTaskProvider, lalu konsumsi via useDevTask(). Pola
+     mutator: async (...) => Promise<{ success: boolean; error?: string }> —
+     validasi permission di awal (return early dengan error yang jelas dalam
+     Bahasa Indonesia), lalu try/catch di sekitar panggilan API, update state
+     lokal dari response server (jangan optimistic-update lalu asumsikan sukses).
+
+  3. currentUser bisa null. Session belum tentu ada (User | null di context).
+     Route yang butuh auth di-guard di App.tsx (redirect ke /login bila
+     currentUser null) — jangan duplikasi guard itu di tiap komponen. Komponen
+     yang dirender di luar guard tree tetap harus null-safe: pakai
+     !!currentUser && ... untuk kondisi role, atau early return
+     if (!currentUser) return null; SETELAH semua hook lain dipanggil (jangan
+     taruh return sebelum hook — melanggar Rules of Hooks).
+
+  4. Role-gating pakai array .includes(), bukan switch bertingkat, contoh:
+     const allowed = !!currentUser && ['Admin', 'PM', 'DevLeader', 'QALeader'].includes(currentUser.role);
+     Pertahankan daftar role yang identik dengan yang dipakai backend
+     (authorizeRoles([...]) di route terkait) — jika daftar berbeda antara
+     frontend dan backend, itu bug, bukan preferensi.
+
+  5. Pesan error & UI teks berbahasa Indonesia. Semua string yang tampil ke
+     user (label, placeholder, pesan error, judul) dalam Bahasa Indonesia,
+     konsisten dengan BRD. Pesan error dari ApiError (lemparan dari
+     api/client.ts) sudah dalam Bahasa Indonesia dari backend — teruskan apa
+     adanya (err.message), jangan diterjemahkan ulang atau digenerikkan.
+
+  6. Pola tampilan error inline (bukan alert()/confirm(), kecuali untuk
+     konfirmasi aksi destruktif seperti reset data):
+     <div className="p-3 bg-red-50 border border-red-200 text-red-650 text-xs rounded-xl flex items-center gap-2">
+       <AlertOctagon className="w-4 h-4 flex-shrink-0" />
+       <span>{error}</span>
+     </div>
+
+  7. Styling: warna brand pakai token brand-{50..950} (lihat @theme di
+     index.css), jangan hardcode hex baru di className — tambahkan token baru
+     ke @theme bila perlu warna baru. Panel/card pakai class .glass-panel
+     (+ .glass-panel-hover bila interaktif), sudut rounded-xl/rounded-2xl,
+     bayangan .glow-primary/.glow-success/.glow-warning/.glow-danger. Label
+     kecil konsisten: text-xs font-bold text-slate-500 uppercase
+     tracking-wider. Tombol cursor selalu cursor-pointer eksplisit, state
+     disabled selalu disabled:opacity-50. Ikon dari lucide-react saja.
+
+  8. Fungsi async yang mengubah data harus benar-benar async/await di
+     pemanggilnya. Mutator context memanggil API sungguhan (bukan mock lokal),
+     jadi setiap onClick/onSubmit handler yang memanggilnya wajib async dan
+     await hasilnya sebelum membaca res.success/res.error.
+
+  9. Tanpa komentar kecuali menjelaskan WHY yang tidak jelas dari kode. Ikuti
+     gaya codebase yang sudah ada: nyaris tanpa komentar, kecuali untuk hal
+     non-obvious (mis. alasan Firefox tidak bisa pakai channel, alasan
+     EventSource butuh SSE tanpa header auth).
+
+  ## Referensi Silang
+
+  - Kontrak API & role yang diizinkan per endpoint:
+    openspec/specs/backend-rest-api/spec.md, jwt-user-authentication/spec.md, dst.
+  - Skenario pengujian & status otomasi: docs/SIT_DevTaskMan.md.
+  - Riwayat keputusan pola async context ini:
+    openspec/changes/archive/2026-08-16-backend-frontend-integration/design.md.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
