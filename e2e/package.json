@@ -1,0 +1,15 @@
+{
+  "name": "devtaskman-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}

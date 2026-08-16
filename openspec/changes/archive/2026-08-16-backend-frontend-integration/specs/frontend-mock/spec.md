@@ -1,8 +1,5 @@
-# frontend-mock Specification
+## MODIFIED Requirements
 
-## Purpose
-Provides a responsive web interface mockup with mock data to simulate and validate user workflows, dashboards, role-based task transitions, and Slack notifications.
-## Requirements
 ### Requirement: Role Selection and Dashboard Views
 The web application SHALL authenticate users against the backend and display customized metrics dashboards based on the authenticated user's server-assigned role (Admin, PM, Dev/QA Leader, Developer, QA Engineer).
 
@@ -17,21 +14,6 @@ The web application SHALL authenticate users against the backend and display cus
 #### Scenario: PM Dashboard Overview
 - **WHEN** the PM role is selected
 - **THEN** the system SHALL display interactive charts representing task status distribution, remaining tasks vs deadline, and team performance metrics, computed from tasks fetched via `GET /api/v1/tasks`
-
-### Requirement: Kanban Board and Role-Based Transitions
-The system SHALL display tasks on a Kanban board categorized by status columns and enforce role-based constraints on status changes.
-
-#### Scenario: Developer moving task to Ready for QA
-- **WHEN** a Developer attempts to move a task from "In Progress" to "Ready for QA"
-- **THEN** the system SHALL allow the state change and display the task in the "Ready for QA" column
-
-#### Scenario: Developer blocked from moving task beyond Ready for QA
-- **WHEN** a Developer attempts to move a task from "Ready for QA" to "Testing" or "Done"
-- **THEN** the system SHALL block the transition, show an error alert, and revert the task position
-
-#### Scenario: QA moving task to In Progress on failure
-- **WHEN** a QA Engineer moves a task from "Testing" back to "In Progress" (marked as rework)
-- **THEN** the system SHALL allow the transition, prompt for a brief description of the bug/reason, and update the task status
 
 ### Requirement: Task Administration
 The system SHALL allow PMs and Leaders to create, update, and delete tasks via the backend REST API.
@@ -64,4 +46,3 @@ The system SHALL provide a CSV template download and allow Admins to upload a CS
 #### Scenario: Admin downloads template and uploads CSV
 - **WHEN** the Admin clicks the CSV template download and uploads a CSV containing employee names and roles
 - **THEN** the system SHALL parse the CSV client-side, submit the parsed rows via `POST /api/v1/users/import`, and populate the user list from the server's response
-
