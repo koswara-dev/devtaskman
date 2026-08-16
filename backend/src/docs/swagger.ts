@@ -1,6 +1,11 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import path from 'path';
 
+// glob (used internally by swagger-jsdoc) expects forward-slash paths; on Windows
+// path.join() produces backslashes, which glob interprets as escape characters and
+// the pattern silently matches nothing. Normalize to forward slashes explicitly.
+const toGlobPath = (...segments: string[]) => path.join(...segments).split(path.sep).join('/');
+
 const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.3',
@@ -87,7 +92,7 @@ const options: swaggerJSDoc.Options = {
     },
     security: [{ bearerAuth: [] }]
   },
-  apis: [path.join(__dirname, '../routes/*.{ts,js}')]
+  apis: [toGlobPath(__dirname, '../routes/*.{ts,js}')]
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
