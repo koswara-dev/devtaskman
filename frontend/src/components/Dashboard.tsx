@@ -6,6 +6,15 @@ import { downloadFile } from '../api/client';
 
 const REPORTING_ROLES = ['Admin', 'PM', 'DevLeader', 'QALeader'];
 
+const ROLE_GREETINGS: Record<string, string> = {
+  Admin: 'Kontrol penuh sistem — pantau seluruh proyek dan tim.',
+  PM: 'Pantau progres tim & prioritas rilis dari satu layar.',
+  DevLeader: 'Awasi beban kerja developer dan kualitas kode.',
+  QALeader: 'Kelola strategi pengujian dan status QA tim.',
+  Developer: 'Fokus pada tugas aktif dan target penyelesaian.',
+  QA: 'Cek antrian pengujian dan tugas siap divalidasi.'
+};
+
 export const Dashboard: React.FC = () => {
   const { tasks, users, currentUser } = useDevTask();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -101,6 +110,12 @@ export const Dashboard: React.FC = () => {
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 m-0">Ringkasan Dasbor</h2>
           <p className="text-xs text-slate-500 mt-1">Status real-time proyek DevTaskMan, rasio prioritas, dan beban kerja tim.</p>
+          {currentUser && (
+            <p className="text-xs font-semibold text-brand-600 mt-1.5 flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full bg-brand-50 border border-brand-100">{currentUser.role}</span>
+              <span className="text-slate-500 font-normal">{ROLE_GREETINGS[currentUser.role] ?? 'Selamat datang kembali.'}</span>
+            </p>
+          )}
         </div>
 
         {canDownloadReport && (
