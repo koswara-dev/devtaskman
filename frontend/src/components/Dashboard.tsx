@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useDevTask } from '../context/DevTaskContext';
 import type { TaskStatus } from '../types';
-import { BarChart3, PieChart, Activity, CheckCircle2, ListTodo, AlertTriangle, Users, FileDown, AlertOctagon } from 'lucide-react';
+import { BarChart3, PieChart, Activity, CheckCircle2, ListTodo, AlertTriangle, Users, FileDown, AlertOctagon, ShieldCheck, ClipboardList, Bug, Target, Crown, Wrench } from 'lucide-react';
 import { downloadFile } from '../api/client';
 
 const REPORTING_ROLES = ['Admin', 'PM', 'DevLeader', 'QALeader'];
+const PERSONAL_FOCUS_ROLES = ['Developer', 'QA'];
 
 const ROLE_GREETINGS: Record<string, string> = {
   Admin: 'Kontrol penuh sistem — pantau seluruh proyek dan tim.',
@@ -13,6 +14,15 @@ const ROLE_GREETINGS: Record<string, string> = {
   QALeader: 'Kelola strategi pengujian dan status QA tim.',
   Developer: 'Fokus pada tugas aktif dan target penyelesaian.',
   QA: 'Cek antrian pengujian dan tugas siap divalidasi.'
+};
+
+const ROLE_THEME: Record<string, { banner: string; badge: string; icon: React.ElementType }> = {
+  Admin: { banner: 'bg-purple-50 border-purple-200 text-purple-800', badge: 'bg-purple-100 text-purple-700 border-purple-200', icon: Crown },
+  PM: { banner: 'bg-blue-50 border-blue-200 text-blue-800', badge: 'bg-blue-100 text-blue-700 border-blue-200', icon: ClipboardList },
+  DevLeader: { banner: 'bg-indigo-50 border-indigo-200 text-indigo-800', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200', icon: Wrench },
+  QALeader: { banner: 'bg-pink-50 border-pink-200 text-pink-800', badge: 'bg-pink-100 text-pink-700 border-pink-200', icon: ShieldCheck },
+  Developer: { banner: 'bg-emerald-50 border-emerald-200 text-emerald-800', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: Target },
+  QA: { banner: 'bg-rose-50 border-rose-200 text-rose-800', badge: 'bg-rose-100 text-rose-700 border-rose-200', icon: Bug }
 };
 
 export const Dashboard: React.FC = () => {
@@ -103,6 +113,11 @@ export const Dashboard: React.FC = () => {
     };
   }).sort((a, b) => b.totalCount - a.totalCount);
 
+  const roleTheme = currentUser ? (ROLE_THEME[currentUser.role] ?? ROLE_THEME.Developer) : null;
+  const RoleIcon = roleTheme?.icon ?? Target;
+  const myWorkload = currentUser ? userWorkload.find(w => w.user.id === currentUser.id) : undefined;
+  const showPersonalSpotlight = !!currentUser && PERSONAL_FOCUS_ROLES.includes(currentUser.role);
+
   return (
     <div className="space-y-6 select-none text-slate-700">
       {/* Page Header */}
@@ -110,12 +125,6 @@ export const Dashboard: React.FC = () => {
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 m-0">Ringkasan Dasbor</h2>
           <p className="text-xs text-slate-500 mt-1">Status real-time proyek DevTaskMan, rasio prioritas, dan beban kerja tim.</p>
-          {currentUser && (
-            <p className="text-xs font-semibold text-brand-600 mt-1.5 flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-full bg-brand-50 border border-brand-100">{currentUser.role}</span>
-              <span className="text-slate-500 font-normal">{ROLE_GREETINGS[currentUser.role] ?? 'Selamat datang kembali.'}</span>
-            </p>
-          )}
         </div>
 
         {canDownloadReport && (
@@ -130,10 +139,45 @@ export const Dashboard: React.FC = () => {
         )}
       </div>
 
+      {/* Role Banner — visually distinct per role (color + icon + tailored message) */}
+      {currentUser && roleTheme && (
+        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${roleTheme.banner}`}>
+          <div className={`p-2.5 rounded-xl border ${roleTheme.badge}`}>
+            <RoleIcon className="w-5 h-5" />
+          </div>
+          <div className="min-w-0">
+            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border mb-1 ${roleTheme.badge}`}>
+              {currentUser.role}
+            </span>
+            <p className="text-sm font-semibold m-0">{ROLE_GREETINGS[currentUser.role] ?? 'Selamat datang kembali.'}</p>
+          </div>
+        </div>
+      )}
+
       {downloadError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-650 text-xs rounded-xl flex items-center gap-2">
           <AlertOctagon className="w-4 h-4 flex-shrink-0" />
           <span>{downloadError}</span>
+        </div>
+      )}
+
+      {/* Personal Spotlight — only for Developer/QA: their own workload, not team-wide stats */}
+      {showPersonalSpotlight && myWorkload && (
+        <div className={`p-5 rounded-2xl border ${roleTheme?.banner} flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8`}>
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider opacity-70">Tugas Saya Aktif</span>
+            <span className="text-3xl font-extrabold block mt-1">{myWorkload.active}</span>
+          </div>
+          <div className="h-10 w-px bg-current opacity-20 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider opacity-70">Sudah Saya Selesaikan</span>
+            <span className="text-3xl font-extrabold block mt-1">{myWorkload.completed}</span>
+          </div>
+          <div className="h-10 w-px bg-current opacity-20 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider opacity-70">Total Ditugaskan</span>
+            <span className="text-3xl font-extrabold block mt-1">{myWorkload.totalCount}</span>
+          </div>
         </div>
       )}
 
