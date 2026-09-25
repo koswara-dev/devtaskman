@@ -141,7 +141,7 @@ export const Dashboard: React.FC = () => {
 
       {/* Role Banner — visually distinct per role (color + icon + tailored message) */}
       {currentUser && roleTheme && (
-        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${roleTheme.banner}`}>
+        <div data-testid="dashboard-role-banner" className={`flex items-center gap-3 p-4 rounded-2xl border ${roleTheme.banner}`}>
           <div className={`p-2.5 rounded-xl border ${roleTheme.badge}`}>
             <RoleIcon className="w-5 h-5" />
           </div>
