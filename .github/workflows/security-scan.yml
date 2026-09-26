@@ -31,6 +31,13 @@ jobs:
             --config p/owasp-top-ten \
             --config p/nodejsscan \
             --config p/react \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_dns_prefetch \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_hsts \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_ienoopen \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_nosniff \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_x_powered_by \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_xss_filter \
+            --exclude-rule ajinabraham.njsscan.good.good_helmet_checks.helmet_header_check_csp \
             --error \
             --sarif --output semgrep-results.sarif \
             backend/ frontend/

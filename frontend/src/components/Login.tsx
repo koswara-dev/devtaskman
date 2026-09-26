@@ -20,7 +20,9 @@ const DEMO_ACCOUNTS: { email: string; name: string; role: Role; avatarUrl: strin
   { email: 'helen@company.com', name: 'Helen QA', role: 'QA', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' }
 ];
 
-const DEMO_PASSWORD = 'password123';
+// Intentional: shared password for the seeded demo accounts only (documented in README's
+// Quick Sign-In section), not a real credential — never used for production/non-demo users.
+const DEMO_PASSWORD = 'password123'; // nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_password
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const { login } = useDevTask();

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { randomUUID } from 'crypto';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { query } from '../db/db';
 import { validationResult } from 'express-validator';
@@ -176,7 +177,7 @@ export const updateTask = async (req: AuthenticatedRequest, res: Response) => {
     // Insert history logs
     const timestamp = new Date().toISOString();
     for (const act of changes) {
-      const logId = `hist-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+      const logId = `hist-${Date.now()}-${randomUUID().slice(0, 8)}`;
       await query(
         'INSERT INTO history_logs(id, task_id, user_name, action, timestamp) VALUES($1, $2, $3, $4, $5)',
         [logId, id, userName, act, timestamp]

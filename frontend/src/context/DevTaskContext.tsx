@@ -30,7 +30,8 @@ interface DevTaskContextType {
 
 const DevTaskContext = createContext<DevTaskContextType | undefined>(undefined);
 
-const CURRENT_USER_KEY = 'dtm_current_user';
+// False positive: this is a localStorage key name, not a credential/username value.
+const CURRENT_USER_KEY = 'dtm_current_user'; // nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_username
 
 const errorMessage = (err: unknown, fallback: string) => (err instanceof ApiError ? err.message : fallback);
 
